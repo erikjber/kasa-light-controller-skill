@@ -1,6 +1,7 @@
 from mycroft import MycroftSkill, intent_file_handler
 from kasa import SmartPlug, Discover
 import asyncio
+import time
 
 class KasaLightController(MycroftSkill):
     def __init__(self):
@@ -13,10 +14,11 @@ class KasaLightController(MycroftSkill):
         self.devices = {}
         for addr,dev in devs.items():
             asyncio.run(dev.update())
-            self.devices[dev.alias]=addr
+            self.devices[dev.alias.lower()]=addr
 
     def turn_off(self,name):
         """Turn off a named device"""
+        name = name.lower()
         if name in self.devices:
             addr = self.devices[name]
             plug = SmartPlug(addr)
@@ -26,6 +28,7 @@ class KasaLightController(MycroftSkill):
 
     def turn_on(self,name):
         """Turn on a named device"""
+        name = name.lower()
         if name in self.devices:
             addr = self.devices[name]
             plug = SmartPlug(addr)
@@ -39,7 +42,7 @@ class KasaLightController(MycroftSkill):
         self.locate_all()
         if 'living room' in name:
             self.turn_on('moon')
-            self.turn_on('mushroom')
+            self.turn_on('window')
             self.turn_on('reading')
             self.turn_on('globe')
             self.turn_on('mirror')
@@ -54,7 +57,7 @@ class KasaLightController(MycroftSkill):
         self.locate_all()
         if 'living room' in name:
             self.turn_off('moon')
-            self.turn_off('mushroom')
+            self.turn_off('window')
             self.turn_off('reading')
             self.turn_off('globe')
             self.turn_off('mirror')
@@ -62,7 +65,6 @@ class KasaLightController(MycroftSkill):
             res = self.turn_off(name)
             if res == False:
                 self.speak("Could not find " + name)
-
 
 
 def create_skill():
